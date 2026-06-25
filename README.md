@@ -1,3 +1,13 @@
+========================================================================
+       PANDUAN KHUSUS: CARA MENGAMBIL & UPLOAD KODE ARDUINO (BRANCH MAIN)
+========================================================================
+
+Jika Anda adalah tim penguji atau divisi hardware yang hanya ingin fokus 
+mengambil dan menjalankan kodingan komponen IoT/Mikrokontroler:
+
+------------------------------------------------------------------------
+LANGKAH 1: DOWNLOAD & SHIFT KE JALUR ARDUINO (GIT BASH)
+------------------------------------------------------------------------
 1. Buka terminal Git Bash di komputer Anda, lalu unduh repositori:
    $ git clone https://github.com/febrypradana/Smart-tongkat-tunanetra_Berbasis-web.git
    $ cd Smart-tongkat-tunanetra_Berbasis-web
@@ -11,4 +21,3 @@
    *Catatan: Setelah perintah ini dieksekusi, seluruh isi file di folder 
    lokal komputer Anda otomatis berubah total menjadi berkas kodingan 
    Arduino (.ino) yang dikerjakan oleh M. Khoirul Aminin & Nanda Firstyanto.
-
