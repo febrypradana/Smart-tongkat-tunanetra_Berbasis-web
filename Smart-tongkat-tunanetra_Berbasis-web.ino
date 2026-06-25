@@ -5,13 +5,15 @@
 LiquidCrystal_I2c lcd(0x27, 16, 2);
 
 //pin sensor ultra sonic kiri
-
-
+const int trigKiri = 2;
+const int echoKiri = 3;
 
 //pin sensor ultra sonic depan
 
 
 //pin sensor ultra sonic kanan
+const int trigKanan = 6;
+const int echoKanan = 7;
 
 
 //buzzer
@@ -19,15 +21,27 @@ LiquidCrystal_I2c lcd(0x27, 16, 2);
 //led
 const int ledpin = 9;
 
+// Jarak maksimal deteksi rintangan (dalam centimeter)
+const int jarakAman = 60;
 
-//status mengecek mode tersesat
+// status mengecek mode tersesat
 bool sedangTersesat = false;
+
+// Variabel penampung waktu membatasi pengiriman data serial
+unsigned long waktuLamaKirim = 0;
 
 
 void setup() {
 
 //sensor ultra sonic (depan,kiri dan kanan)
 
+//Sensor ultra sonic (kiri)
+pinMode(trigKiri,OUTPUT);
+pinMode(echoKiri,INPUT); 
+
+// sensor ultra sonic (kanan)
+pinMode (trigKanan,OUTPUT);
+pinMode (echoKanan,INPUT);
 
 
 
@@ -91,3 +105,21 @@ void loop() {
       sedangTersesat = false;                
       }
 }
+      // jalankan logika sensor ultrra sonic
+      if (sedangtersesat == false) {
+        // baca jarak dari sensor
+        long jarakKiri = bacaJarak(trigKiri,echoKiri);
+        long jarakKanan = bacaJarak(trigKanan,echoKanan);
+
+        // cari jarak terdekat dari ke 3 arah
+        long JarakTerdekat = JarakDepan;
+        if (JarakKiri < JarakTerdekat) jarakTerdekat = JarakKiri;
+        if (JarakKanan < JarakTerdekat) jarakTerdekat = JarakKanan;
+
+        // batasi pengiriman serial setiap (5 detik)
+        if (millis() - waktuLamaKirim >= 500) {
+          serial.println(JarakTerdekat);
+          waktuLamaKirim = millis();
+          }
+          
+        }
