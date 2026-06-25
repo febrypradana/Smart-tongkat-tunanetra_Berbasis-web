@@ -9,6 +9,8 @@ const int trigKiri = 2;
 const int echoKiri = 3;
 
 //pin sensor ultra sonic depan
+const int trigDepan = 4;
+const int echoDepan = 5;
 
 
 //pin sensor ultra sonic kanan
@@ -17,6 +19,7 @@ const int echoKanan = 7;
 
 
 //buzzer
+const int buzzer = 8;
 
 //led
 const int ledpin = 9;
@@ -39,13 +42,16 @@ void setup() {
 pinMode(trigKiri,OUTPUT);
 pinMode(echoKiri,INPUT); 
 
+// sensor ultra sonic (depan)
+pinMode(trigDepan,OUTPUT);
+pinMode(echoDepan,INPUT); 
+
 // sensor ultra sonic (kanan)
 pinMode (trigKanan,OUTPUT);
 pinMode (echoKanan,INPUT);
 
-
-
 //buzzer
+pinMode(buzzer, OUTPUT);
 
 //led pin
 pinMode(ledpin, OUTPUT);
@@ -121,5 +127,49 @@ void loop() {
           serial.println(JarakTerdekat);
           waktuLamaKirim = millis();
           }
-          
+          //BUNYI BUZZER & LED BERDASARKAN JARAK SENSOR 
+          if(jarakTerdekat > 0 && jarakTerdekat <= jarakAman){
+
+            //Skenario 1:SANGAT BAHAYA (30 cm) Bunyi Panjang
+            if(jarakTerdekat <=30){
+              digitalWrite(buzzer, HIGH);
+              digitalWrite(ledPin, HIGH);
+              delay(10);
+            }
+           //Skenario 2: PERINGATAN(31 cm sampai 60 cm) Bunyi Putus Putus
+            else {
+              int jedaBunyi = map(jarakTerdekat, 31, jarakAman, 30, 300);
+              if (jedaBunyi < 30) jedaBunyi = 30;
+
+              digitalWrite(buzzer, HIGH);
+              digitalWrite(ledPin, HIGH);
+              delay(50);
+
+              digitalWrite(buzzer, LOW);
+              digitalWrite(ledPin, LOW);
+              delay(jedaBunyi); 
+            }
+            
+          } else {
+            //Skenario 3: AMAN (> 60cm )Semua fungsi deteksi mati 
+             digitalWrite(buzzer, LOW);
+              digitalWrite(ledPin, LOW);
+              delay(20); 
+          }
+         }  
+       }
+       
+         //Fungsi khusus menghitung jarak sensor HC-SR04
+         long bacaJarak(int trigPin, int echoPin) {
+          digitalWrite(trigPin, LOW);
+          delayMicroseconds(2);
+          digitalWrite(trigPin, HIGH);
+          delayMicroseconds(10);
+          digitalWrite(trigPin, LOW);
+
+          long durasi = pulseIn(echoPin, HIGH, 20000);
+          long cm = durasi * 0.034 / 2;
+
+          if (cm == 0 || cm > 200) return 200;
+          return cm;          
         }
