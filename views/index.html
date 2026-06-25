@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sash Pantauan - Tongkat Tuna Netra</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f0f3fb; color: #334155; padding: 30px; display: flex; justify-content: center; }
+        
+        /* Main Frame Dashboard */
+        .dashboard-container { width: 1000px; background-color: #ffffff; border-radius: 16px; overflow: hidden; padding: 25px; box-shadow: 0 10px 30px rgba(135, 148, 195, 0.15); border: 1px solid #e2e8f0; }
+        
+        /* Header Top Bar Elegan */
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid #f1f5f9; }
+        .dashboard-header h2 { color: #6259ca; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+        .dashboard-header p { font-size: 13px; color: #94a3b8; margin-top: 2px; }
+        
+        /* Alert Box Darurat Animasi */
+        .alert-box { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); padding: 16px 20px; border-left: 5px solid #ef4444; display: none; margin-bottom: 20px; border-radius: 8px; font-weight: 600; color: #991b1b; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1); }
+        .alert-box button { float: right; cursor: pointer; background: none; border: none; font-weight: 700; color: #991b1b; font-size: 14px; }
+
+        /* Teks Status Jarak */
+        .live-text { font-size: 13px; color: #64748b; background: #f8fafc; padding: 10px 16px; border-radius: 8px; display: inline-block; margin-bottom: 15px; border: 1px solid #f1f5f9; }
+        .live-text strong { color: #334155; }
+
+        /* Grid Layout Tengah */
+        .grid-layout { display: grid; grid-template-columns: 2.2fr 1fr; gap: 24px; margin-bottom: 25px; }
+        
+        /* Card Panel Grafik */
+        .card-grafik { background-color: #ffffff; border-radius: 12px; padding: 20px; min-height: 360px; display: flex; flex-direction: column; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); }
+        .card-grafik h3 { font-size: 15px; color: #475569; margin-bottom: 15px; font-weight: 600; }
+        .chart-container { position: relative; flex-grow: 1; width: 100%; height: 100%; }
+        
+        /* Card Panel Keramaian Kanan - Gradasi Ungu Indah */
+        .card-keramaian { background: linear-gradient(135deg, #6259ca 0%, #a259ca 100%); border-radius: 12px; padding: 30px 24px; color: #ffffff; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 10px 20px rgba(98, 89, 202, 0.2); position: relative; overflow: hidden; }
+        .card-keramaian::before { content: ''; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%; }
+        .card-keramaian .title { font-size: 16px; font-weight: 600; letter-spacing: 0.2px; }
+        .card-keramaian .sub-title { font-size: 12px; margin-top: 4px; opacity: 0.8; font-weight: normal; }
+        .card-keramaian .value-persen { font-size: 54px; font-weight: 700; margin: 20px 0 5px 0; font-variant-numeric: tabular-nums; }
+        .card-keramaian .value-status { font-size: 15px; font-weight: 500; background: rgba(255, 255, 255, 0.2); padding: 6px 14px; border-radius: 20px; width: max-content; backdrop-filter: blur(5px); margin-bottom: 20px; }
+        .card-keramaian .btn-reset { color: #ffffff; border: none; background: none; font-weight: 500; text-decoration: underline; cursor: pointer; text-align: left; font-size: 13px; width: max-content; opacity: 0.9; transition: opacity 0.2s; }
+        .card-keramaian .btn-reset:hover { opacity: 1; }
+        
+        /* Area Footer Bawah */
+        .footer-action { display: flex; justify-content: center; padding-top: 5px; }
+        
+        /* Desain Tombol Tersesat Mewah */
+        .btn-tersesat { width: 100%; max-width: 450px; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); color: #6259ca; font-size: 15px; font-weight: 600; padding: 14px 0; border: 1px solid #cbd5e1; border-radius: 50px; cursor: pointer; text-align: center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); transition: all 0.2s ease; }
+        .btn-tersesat:hover { background: #6259ca; color: #ffffff; border-color: #6259ca; box-shadow: 0 8px 15px rgba(98, 89, 202, 0.25); transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <div>
+            <h2>Dashboard Pantauan Keluarga</h2>
+            <p>Sistem Pantauan cerdas tunanetra secara real-time</p>
+        </div>
+    </div>
+
+    <div id="alertTersesat" class="alert-box">
+        ⚠️ <span id="alertMessage">Mode Tersesat Diaktifkan</span>
+        <button onclick="clearAlert()">Tutup</button>
+    </div>
+
+    <div class="live-text">
+        Nilai Jarak Terkini: <strong><span id="data">Menunggu data sensor...</span></strong>
+    </div>
+
+    <div class="grid-layout">
+        <div class="card-grafik">
+            <h3>Sales Analytics - Fluktuasi Jarak Rintangan</h3>
+            <div class="chart-container">
+                <canvas id="sensorChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card-keramaian">
+            <div>
+                <div class="title">Tingkat Keramaian Jalan</div>
+                <div class="sub-title">Berdasarkan kepadatan rintangan terdeteksi</div>
+            </div>
+            <div>
+                <div id="persenTeks" class="value-persen">0%</div>
+                <div id="statusJalan" class="value-status">Sepi / Aman</div>
+            </div>
+            <button class="btn-reset" onclick="resetAnalisis()">Reset Rekam Data</button>
+        </div>
+    </div>
+
+    <div class="footer-action">
+        <button class="btn-tersesat" onclick="terimaSinyalTersesat()">Tersesat</button>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    let totalSinyalMasuk = 0;
+    let jumlahSinyalPadat = 0; 
+
+    // Inisialisasi Grafik Chart.js Premium Style (Smooth Area Spline)
+    const ctx = document.getElementById('sensorChart').getContext('2d');
+    const maxDataPoints = 12; 
+    const sensorChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [], 
+            datasets: [{
+                label: 'Jarak Objek (cm)',
+                data: [],
+                borderColor: '#6259ca', 
+                backgroundColor: 'rgba(98, 89, 202, 0.15)', 
+                borderWidth: 2.5,
+                fill: true,
+                pointBackgroundColor: '#6259ca',
+                pointRadius: 2,
+                tension: 0.4 
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false } 
+            },
+            scales: {
+                x: { grid: { display: false } },
+                y: { beginAtZero: true, max: 200, grid: { color: '#f1f5f9' } }
+            }
+        }
+    });
+
+    // Menangkap data dari Node.js (Port 5000)
+    socket.on("dataSensor", ({ data }) => {
+        const jarak = parseFloat(data);
+        
+        if (!isNaN(jarak)) {
+            document.getElementById("data").textContent = jarak + " cm";
+            const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            
+            totalSinyalMasuk++;
+            if (jarak <= 60) {
+                jumlahSinyalPadat++;
+            }
+
+            const persentaseKeramaian = Math.round((jumlahSinyalPadat / totalSinyalMasuk) * 100);
+            document.getElementById("persenTeks").textContent = persentaseKeramaian + "%";
+
+            const statusJalan = document.getElementById("statusJalan");
+            if (persentaseKeramaian <= 25) {
+                statusJalan.textContent = "Sepi / Aman";
+            } else if (persentaseKeramaian > 25 && persentaseKeramaian <= 60) {
+                statusJalan.textContent = "Sedang / Normal";
+            } else {
+                statusJalan.textContent = "Sangat Ramai / Padat";
+            }
+
+            sensorChart.data.labels.push(now);
+            sensorChart.data.datasets[0].data.push(jarak);
+
+            if (sensorChart.data.labels.length > maxDataPoints) {
+                sensorChart.data.labels.shift();
+                sensorChart.data.datasets[0].data.shift();
+            }
+            sensorChart.update();
+        }
+    });
+
+    // Menangkap sinyal darurat asli dari Arduino via Socket.io
+    socket.on("tersesatAlert", (res) => {
+        const alertBox = document.getElementById("alertTersesat");
+        document.getElementById("alertMessage").textContent = res.message;
+        alertBox.style.display = "block"; 
+    });
+
+    function clearAlert() {
+        document.getElementById("alertTersesat").style.display = "none";
+    }
+
+    // Mengirim sinyal angka 4 murni ke server backend Node.js secara lokal
+    function terimaSinyalTersesat() {
+        fetch("/arduinoApi", {
+            method: "POST",
+            body: JSON.stringify({ data: "4" }),
+            headers: { "Content-Type": "application/json" }
+        })
+        .then(res => res.json())
+        .then(data => console.log("Response backend:", data))
+        .catch(err => console.log("Gagal kirim data balik:", err));
+    }
+
+    function resetAnalisis() {
+        totalSinyalMasuk = 0;
+        jumlahSinyalPadat = 0;
+        document.getElementById("persenTeks").textContent = "0%";
+        document.getElementById("statusJalan").textContent = "Sepi / Aman";
+    }
+</script>
+
+</body>
+</html>
