@@ -33,7 +33,6 @@ bool sedangTersesat = false;
 // Variabel penampung waktu membatasi pengiriman data serial
 unsigned long waktuLamaKirim = 0;
 
-
 void setup() {
 
 //sensor ultra sonic (depan,kiri dan kanan)
@@ -155,7 +154,7 @@ void loop() {
              digitalWrite(buzzer, LOW);
               digitalWrite(ledPin, LOW);
               delay(20); 
-          }
+           }
          }  
        }
        
